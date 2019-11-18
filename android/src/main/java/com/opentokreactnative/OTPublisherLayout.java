@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OTPublisherLayout extends FrameLayout{
 
     public OTRN sharedState;
+    private String publisherId;
 
     public OTPublisherLayout(ThemedReactContext reactContext) {
 
@@ -25,7 +26,7 @@ public class OTPublisherLayout extends FrameLayout{
     }
 
     public void createPublisherView(String publisherId) {
-
+        this.publisherId = publisherId;
         ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
         ConcurrentHashMap<String, String> androidOnTopMap = sharedState.getAndroidOnTopMap();
         ConcurrentHashMap<String, String> androidZOrderMap = sharedState.getAndroidZOrderMap();
@@ -42,17 +43,47 @@ public class OTPublisherLayout extends FrameLayout{
             mPublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
                     BaseVideoRenderer.STYLE_VIDEO_FILL);
             FrameLayout mPublisherViewContainer = new FrameLayout(getContext());
-            if (pubOrSub.equals("publisher") && mPublisher.getView() instanceof GLSurfaceView) {
+            /*if (pubOrSub.equals("publisher") && mPublisher.getView() instanceof GLSurfaceView) {
                 if (zOrder.equals("mediaOverlay")) {
                     ((GLSurfaceView) mPublisher.getView()).setZOrderMediaOverlay(true);
                 } else {
                     ((GLSurfaceView) mPublisher.getView()).setZOrderOnTop(true);
                 }
-            }
+            }*/
+            ((GLSurfaceView) mPublisher.getView()).setZOrderMediaOverlay(false);
             ConcurrentHashMap<String, FrameLayout> mPublisherViewContainers = sharedState.getPublisherViewContainers();
             mPublisherViewContainers.put(publisherId, mPublisherViewContainer);
             addView(mPublisherViewContainer, 0);
             mPublisherViewContainer.addView(mPublisher.getView());
+            requestLayout();
+        }
+
+    }
+
+    public void updateFitLayout(String fitToView) {
+        if (publisherId.length() > 0) {
+            ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
+            Publisher mPublisher = mPublishers.get(this.publisherId);
+            if (mPublisher != null) {
+                if (fitToView == "fit") {
+                    mPublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                            BaseVideoRenderer.STYLE_VIDEO_FIT);
+                } else {
+                    mPublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                            BaseVideoRenderer.STYLE_VIDEO_FILL);
+                }
+                requestLayout();
+            }
+        }
+    }
+
+    public void setZOrderMediaOverlay(Boolean flag) {
+        if (publisherId.length() > 0) {
+            ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
+            Publisher mPublisher = mPublishers.get(publisherId);
+            if (mPublishers != null && mPublisher.getView() instanceof GLSurfaceView) {
+                ((GLSurfaceView) mPublisher.getView()).setZOrderMediaOverlay(flag);
+            }
             requestLayout();
         }
 

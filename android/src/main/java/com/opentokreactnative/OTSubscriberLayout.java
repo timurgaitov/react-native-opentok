@@ -9,6 +9,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.opentok.android.BaseVideoRenderer;
 import com.opentok.android.Subscriber;
 import java.util.concurrent.ConcurrentHashMap;
+import com.opentok.android.Stream.StreamVideoType;
 
 /**
  * Created by manik on 1/10/18.
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OTSubscriberLayout extends FrameLayout{
 
     public OTRN sharedState;
+    private String streamId;
 
     public OTSubscriberLayout(ThemedReactContext reactContext) {
 
@@ -25,7 +27,7 @@ public class OTSubscriberLayout extends FrameLayout{
     }
 
     public void createSubscriberView(String streamId) {
-
+        this.streamId = streamId;
         ConcurrentHashMap<String, Subscriber> mSubscribers = sharedState.getSubscribers();
         ConcurrentHashMap<String, String> androidOnTopMap = sharedState.getAndroidOnTopMap();
         ConcurrentHashMap<String, String> androidZOrderMap = sharedState.getAndroidZOrderMap();
@@ -45,21 +47,62 @@ public class OTSubscriberLayout extends FrameLayout{
             if (mSubscriber.getView().getParent() != null) {
                 ((ViewGroup)mSubscriber.getView().getParent()).removeView(mSubscriber.getView());
             }
-            mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
-                BaseVideoRenderer.STYLE_VIDEO_FILL);
-            if (pubOrSub.equals("subscriber") && mSubscriber.getView() instanceof GLSurfaceView) {
+            /*mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                BaseVideoRenderer.STYLE_VIDEO_FILL);*/
+            /*if (pubOrSub.equals("subscriber") && mSubscriber.getView() instanceof GLSurfaceView) {
                 if (zOrder.equals("mediaOverlay")) {
                     ((GLSurfaceView) mSubscriber.getView()).setZOrderMediaOverlay(true);
                 } else {
                     ((GLSurfaceView) mSubscriber.getView()).setZOrderOnTop(true);
                 }
+            }*/
+            if(mSubscriber.getStream().getStreamVideoType() == StreamVideoType.StreamVideoTypeScreen) {
+                mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                        BaseVideoRenderer.STYLE_VIDEO_FIT);
+            } else {
+                mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                        BaseVideoRenderer.STYLE_VIDEO_FILL);
             }
+            ((GLSurfaceView) mSubscriber.getView()).setZOrderMediaOverlay(true);
             ConcurrentHashMap<String, FrameLayout> mSubscriberViewContainers = sharedState.getSubscriberViewContainers();
             mSubscriberViewContainers.put(streamId, mSubscriberViewContainer);
             addView(mSubscriberViewContainer, 0);
             mSubscriberViewContainer.addView(mSubscriber.getView());
             requestLayout();
         }
+    }
+
+    public void updateFitLayout(String fitToView) {
+        ConcurrentHashMap<String, Subscriber> mSubscribers = sharedState.getSubscribers();
+        Subscriber mSubscriber = mSubscribers.get(this.streamId);
+        if (mSubscriber != null) {
+            if(mSubscriber.getStream().getStreamVideoType() == StreamVideoType.StreamVideoTypeScreen) {
+                mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                        BaseVideoRenderer.STYLE_VIDEO_FIT);
+            } else {
+
+                if(fitToView == "fit") {
+                    mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                            BaseVideoRenderer.STYLE_VIDEO_FIT);
+                } else {
+                    mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                            BaseVideoRenderer.STYLE_VIDEO_FILL);
+                }
+            }
+            requestLayout();
+        }
+    }
+
+    public void setZOrderMediaOverlay(Boolean flag) {
+        if (streamId.length() > 0) {
+            ConcurrentHashMap<String, Subscriber> mSubscribers = sharedState.getSubscribers();
+            Subscriber mSubscriber = mSubscribers.get(this.streamId);
+            if (mSubscriber != null && mSubscriber.getView() instanceof GLSurfaceView) {
+                ((GLSurfaceView) mSubscriber.getView()).setZOrderMediaOverlay(flag);
+            }
+            requestLayout();
+        }
+
     }
 
 }
