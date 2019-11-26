@@ -49,13 +49,13 @@ public class OTSubscriberLayout extends FrameLayout{
             }
             /*mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
                 BaseVideoRenderer.STYLE_VIDEO_FILL);*/
-            /*if (pubOrSub.equals("subscriber") && mSubscriber.getView() instanceof GLSurfaceView) {
+            if (pubOrSub.equals("subscriber") && mSubscriber.getView() instanceof GLSurfaceView) {
                 if (zOrder.equals("mediaOverlay")) {
                     ((GLSurfaceView) mSubscriber.getView()).setZOrderMediaOverlay(true);
                 } else {
                     ((GLSurfaceView) mSubscriber.getView()).setZOrderOnTop(true);
                 }
-            }*/
+            }
             if(mSubscriber.getStream().getStreamVideoType() == StreamVideoType.StreamVideoTypeScreen) {
                 mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
                         BaseVideoRenderer.STYLE_VIDEO_FIT);
@@ -63,7 +63,6 @@ public class OTSubscriberLayout extends FrameLayout{
                 mSubscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
                         BaseVideoRenderer.STYLE_VIDEO_FILL);
             }
-            ((GLSurfaceView) mSubscriber.getView()).setZOrderMediaOverlay(true);
             ConcurrentHashMap<String, FrameLayout> mSubscriberViewContainers = sharedState.getSubscriberViewContainers();
             mSubscriberViewContainers.put(streamId, mSubscriberViewContainer);
             addView(mSubscriberViewContainer, 0);

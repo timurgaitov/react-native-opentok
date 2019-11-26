@@ -258,12 +258,16 @@ public class OTSessionManager extends ReactContextBaseJavaModule
 
     @ReactMethod
     public void disconnectSession(String sessionId, Callback callback) {
-        ConcurrentHashMap<String, Session> mSessions = sharedState.getSessions();
-        ConcurrentHashMap<String, Callback> mSessionDisconnectCallbacks = sharedState.getSessionDisconnectCallbacks();
-        Session mSession = mSessions.get(sessionId);
-        mSessionDisconnectCallbacks.put(sessionId, callback);
-        if (mSession != null) {
-            mSession.disconnect();
+        try {
+            ConcurrentHashMap<String, Session> mSessions = sharedState.getSessions();
+            ConcurrentHashMap<String, Callback> mSessionDisconnectCallbacks = sharedState.getSessionDisconnectCallbacks();
+            Session mSession = mSessions.get(sessionId);
+            mSessionDisconnectCallbacks.put(sessionId, callback);
+            if (mSession != null) {
+                mSession.disconnect();
+            }
+        } catch (Exception e) {
+
         }
     }
 
@@ -507,20 +511,24 @@ public class OTSessionManager extends ReactContextBaseJavaModule
 
     @Override
     public void onDisconnected(Session session) {
-        ConcurrentHashMap<String, Session> mSessions = sharedState.getSessions();
-        ConcurrentHashMap<String, Callback> mSessionDisconnectCallbacks = sharedState.getSessionDisconnectCallbacks();
-        ConcurrentHashMap<String, Callback> mSessionConnectCallbacks = sharedState.getSessionDisconnectCallbacks();
-        setConnectionStatus(session.getSessionId(), 0);
-        WritableMap sessionInfo = EventUtils.prepareJSSessionMap(session);
-        sendEventMap(this.getReactApplicationContext(), session.getSessionId() + ":" + sessionPreface + "onDisconnected", sessionInfo);
-        Callback disconnectCallback = mSessionDisconnectCallbacks.get(session.getSessionId());
-        if (disconnectCallback != null) {
-            disconnectCallback.invoke();
+        try {
+            ConcurrentHashMap<String, Session> mSessions = sharedState.getSessions();
+            ConcurrentHashMap<String, Callback> mSessionDisconnectCallbacks = sharedState.getSessionDisconnectCallbacks();
+            ConcurrentHashMap<String, Callback> mSessionConnectCallbacks = sharedState.getSessionDisconnectCallbacks();
+            setConnectionStatus(session.getSessionId(), 0);
+            WritableMap sessionInfo = EventUtils.prepareJSSessionMap(session);
+            sendEventMap(this.getReactApplicationContext(), session.getSessionId() + ":" + sessionPreface + "onDisconnected", sessionInfo);
+            Callback disconnectCallback = mSessionDisconnectCallbacks.get(session.getSessionId());
+            if (disconnectCallback != null) {
+                disconnectCallback.invoke();
+            }
+            mSessions.remove(session.getSessionId());
+            mSessionConnectCallbacks.remove(session.getSessionId());
+            mSessionDisconnectCallbacks.remove(session.getSessionId());
+            printLogs("onDisconnected: Disconnected from session: " + session.getSessionId());
+        }catch (Exception e) {
+
         }
-        mSessions.remove(session.getSessionId());
-        mSessionConnectCallbacks.remove(session.getSessionId());
-        mSessionDisconnectCallbacks.remove(session.getSessionId());
-        printLogs("onDisconnected: Disconnected from session: " + session.getSessionId());
     }
 
     @Override
@@ -689,18 +697,21 @@ public class OTSessionManager extends ReactContextBaseJavaModule
 
     @Override
     public void onDisconnected(SubscriberKit subscriberKit) {
-
-        String streamId = Utils.getStreamIdBySubscriber(subscriberKit);
-        if (streamId.length() > 0) {
-            ConcurrentHashMap<String, Stream> streams = sharedState.getSubscriberStreams();
-            Stream mStream = streams.get(streamId);
-            WritableMap subscriberInfo = Arguments.createMap();
-            if (mStream != null) {
-                subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream));
+        try {
+            String streamId = Utils.getStreamIdBySubscriber(subscriberKit);
+            if (streamId.length() > 0) {
+                ConcurrentHashMap<String, Stream> streams = sharedState.getSubscriberStreams();
+                Stream mStream = streams.get(streamId);
+                WritableMap subscriberInfo = Arguments.createMap();
+                if (mStream != null) {
+                    subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream));
+                }
+                sendEventMap(this.getReactApplicationContext(), subscriberPreface + "onDisconnected", subscriberInfo);
             }
-            sendEventMap(this.getReactApplicationContext(), subscriberPreface +  "onDisconnected", subscriberInfo);
+            printLogs("onDisconnected: Subscriber disconnected. Stream: " + subscriberKit.getStream().getStreamId());
+        }catch (Exception e) {
+
         }
-        printLogs("onDisconnected: Subscriber disconnected. Stream: "+subscriberKit.getStream().getStreamId());
     }
 
     @Override
