@@ -156,7 +156,6 @@ public class OTSessionManager extends ReactContextBaseJavaModule
                     .build();
             mPublisher.setPublisherVideoType(PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeScreen);
         } else {
-            AnnotationsVideoRenderer ren = new AnnotationsVideoRenderer(this.getReactApplicationContext());
             mPublisher = new Publisher.Builder(this.getReactApplicationContext())
                     .audioTrack(audioTrack)
                     .videoTrack(videoTrack)
@@ -164,7 +163,6 @@ public class OTSessionManager extends ReactContextBaseJavaModule
                     .audioBitrate(audioBitrate)
                     .resolution(Publisher.CameraCaptureResolution.valueOf(resolution))
                     .frameRate(Publisher.CameraCaptureFrameRate.valueOf(frameRate))
-                    .renderer(ren)
                     .build();
             if (cameraPosition.equals("back")) {
                 mPublisher.cycleCamera();
