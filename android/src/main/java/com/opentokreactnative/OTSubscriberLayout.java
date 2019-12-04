@@ -72,6 +72,9 @@ public class OTSubscriberLayout extends FrameLayout{
     }
 
     public void updateFitLayout(String fitToView) {
+        if (this.streamId == null) {
+            return;
+        }
         ConcurrentHashMap<String, Subscriber> mSubscribers = sharedState.getSubscribers();
         Subscriber mSubscriber = mSubscribers.get(this.streamId);
         if (mSubscriber != null) {
@@ -93,7 +96,7 @@ public class OTSubscriberLayout extends FrameLayout{
     }
 
     public void setZOrderMediaOverlay(Boolean flag) {
-        if (streamId.length() > 0) {
+        if (streamId != null && streamId.length() > 0) {
             ConcurrentHashMap<String, Subscriber> mSubscribers = sharedState.getSubscribers();
             Subscriber mSubscriber = mSubscribers.get(this.streamId);
             if (mSubscriber != null && mSubscriber.getView() instanceof GLSurfaceView) {
