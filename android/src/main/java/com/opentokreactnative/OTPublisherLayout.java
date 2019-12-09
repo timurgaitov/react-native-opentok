@@ -60,7 +60,7 @@ public class OTPublisherLayout extends FrameLayout{
     }
 
     public void updateFitLayout(String fitToView) {
-        if (publisherId.length() > 0) {
+        if (publisherId != null && publisherId.length() > 0) {
             ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
             Publisher mPublisher = mPublishers.get(this.publisherId);
             if (mPublisher != null) {
@@ -77,7 +77,7 @@ public class OTPublisherLayout extends FrameLayout{
     }
 
     public void setZOrderMediaOverlay(Boolean flag) {
-        if (publisherId.length() > 0) {
+        if (publisherId != null && publisherId.length() > 0) {
             ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
             Publisher mPublisher = mPublishers.get(publisherId);
             if (mPublishers != null && mPublisher.getView() instanceof GLSurfaceView) {
