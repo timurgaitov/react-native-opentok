@@ -4,6 +4,7 @@ package com.opentokreactnative;
  * Created by manik on 1/29/18.
  */
 
+import android.app.Activity;
 import android.util.Log;
 import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
@@ -32,6 +33,7 @@ import com.opentok.android.OpentokError;
 import com.opentok.android.Subscriber;
 import com.opentok.android.SubscriberKit;
 import com.opentokreactnative.utils.AnnotationsVideoRenderer;
+import com.opentokreactnative.utils.CustomVideoCapturer;
 import com.opentokreactnative.utils.EventUtils;
 import com.opentokreactnative.utils.Utils;
 
@@ -156,6 +158,9 @@ public class OTSessionManager extends ReactContextBaseJavaModule
                     .build();
             mPublisher.setPublisherVideoType(PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeScreen);
         } else {
+
+            CustomVideoCapturer capturer = new CustomVideoCapturer(this.getReactApplicationContext(), Publisher.CameraCaptureResolution.HIGH, Publisher.CameraCaptureFrameRate.FPS_30);
+            AnnotationsVideoRenderer ren = new AnnotationsVideoRenderer(this.getReactApplicationContext());
             mPublisher = new Publisher.Builder(this.getReactApplicationContext())
                     .audioTrack(audioTrack)
                     .videoTrack(videoTrack)
@@ -163,6 +168,8 @@ public class OTSessionManager extends ReactContextBaseJavaModule
                     .audioBitrate(audioBitrate)
                     .resolution(Publisher.CameraCaptureResolution.valueOf(resolution))
                     .frameRate(Publisher.CameraCaptureFrameRate.valueOf(frameRate))
+                    .capturer(capturer)
+                    .renderer(ren)
                     .build();
             if (cameraPosition.equals("back")) {
                 mPublisher.cycleCamera();
@@ -933,4 +940,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         printLogs("onStreamVideoTypeChanged");
     }
 
+    public Activity getCurrentActivityFromSuper() {
+        return super.getCurrentActivity();
+    }
 }
