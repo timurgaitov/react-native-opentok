@@ -160,7 +160,6 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         } else {
 
             CustomVideoCapturer capturer = new CustomVideoCapturer(this.getReactApplicationContext(), Publisher.CameraCaptureResolution.HIGH, Publisher.CameraCaptureFrameRate.FPS_30);
-            AnnotationsVideoRenderer ren = new AnnotationsVideoRenderer(this.getReactApplicationContext());
             mPublisher = new Publisher.Builder(this.getReactApplicationContext())
                     .audioTrack(audioTrack)
                     .videoTrack(videoTrack)
@@ -169,7 +168,6 @@ public class OTSessionManager extends ReactContextBaseJavaModule
                     .resolution(Publisher.CameraCaptureResolution.valueOf(resolution))
                     .frameRate(Publisher.CameraCaptureFrameRate.valueOf(frameRate))
                     .capturer(capturer)
-                    .renderer(ren)
                     .build();
             if (cameraPosition.equals("back")) {
                 mPublisher.cycleCamera();
