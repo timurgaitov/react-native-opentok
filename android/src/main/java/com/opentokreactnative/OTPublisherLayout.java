@@ -80,7 +80,7 @@ public class OTPublisherLayout extends FrameLayout{
         if (publisherId != null && publisherId.length() > 0) {
             ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
             Publisher mPublisher = mPublishers.get(publisherId);
-            if (mPublishers != null && mPublisher.getView() instanceof GLSurfaceView) {
+            if (mPublisher != null && mPublisher.getView() instanceof GLSurfaceView) {
                 ((GLSurfaceView) mPublisher.getView()).setZOrderMediaOverlay(flag);
             }
             requestLayout();
