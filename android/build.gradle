@@ -61,7 +61,7 @@ clean.dependsOn 'ndkClean'
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:${_reactNativeVersion}"  // From node_modules
-    implementation 'com.opentok.android:opentok-android-sdk:2.16.2'
+    implementation 'com.opentok.android:opentok-android-sdk:2.16.6'
     implementation("com.serenegiant:common:2.12.4") {
         exclude module: 'support-v4'
     }
