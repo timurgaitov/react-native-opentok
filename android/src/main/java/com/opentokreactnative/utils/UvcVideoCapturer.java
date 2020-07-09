@@ -17,6 +17,7 @@ public class UvcVideoCapturer {
     public int previewHeight;
     private final Object mSync = new Object();
     private UVCCamera mUVCCamera;
+    private SurfaceTexture mSurfaceTexture;
     private BaseUtility baseUtility;
 
     private CustomVideoCapturer mCustomVideoCapturer;
@@ -76,9 +77,11 @@ public class UvcVideoCapturer {
         synchronized (mSync) {
             if (mUVCCamera != null) {
                 try {
-                    mUVCCamera.close();
-                    mUVCCamera.destroy();
+                    if (mUVCCamera != null) mUVCCamera.close();
+                    if (mUVCCamera != null) mUVCCamera.destroy();
                 } catch (final Exception e) {
+                } finally {
+                    mSurfaceTexture.release();
                 }
                 mUVCCamera = null;
             }
@@ -106,7 +109,12 @@ public class UvcVideoCapturer {
                         return;
                     }
                 }
-                camera.setPreviewTexture(new SurfaceTexture(42));
+                if (mSurfaceTexture != null) {
+                    mSurfaceTexture.release();
+                }
+                mSurfaceTexture = new SurfaceTexture(42);
+
+                camera.setPreviewTexture(mSurfaceTexture);
                 camera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP);
                 camera.startPreview();
                 synchronized (mSync) {
